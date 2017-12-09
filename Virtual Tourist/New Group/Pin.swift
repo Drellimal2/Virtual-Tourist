@@ -17,7 +17,7 @@ public class Pin: NSManagedObject {
         // An EntityDescription is an object that has access to all
         // the information you provided in the Entity part of the model
         // you need it to create an instance of this class.
-        if let ent = NSEntityDescription.entity(forEntityName: "Note", in: context) {
+        if let ent = NSEntityDescription.entity(forEntityName: "Pin", in: context) {
             self.init(entity: ent, insertInto: context)
             self.lat = lat
             self.lng = lng

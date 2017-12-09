@@ -33,7 +33,12 @@ class FlickrClient : NSObject {
         let task = session.dataTask(with: request) { (data, response, error) in
             
             func makeError(_ desc : String, _ code : Int = 1) -> NSError{
-                return NSError(domain: "Flickr", code: code, userInfo: ["Error String" : desc])
+                let userInfo: [AnyHashable : Any] =
+                    [
+                        NSLocalizedDescriptionKey :  NSLocalizedString("Client Error", value: desc, comment: "") ,
+                        NSLocalizedFailureReasonErrorKey : NSLocalizedString("Client Error", value: desc, comment: "")
+                ]
+                return NSError(domain: "Flickr", code: code, userInfo: userInfo as? [String : Any])
             }
             /* GUARD: Was there an error? */
             guard (error == nil) else {
@@ -100,6 +105,7 @@ class FlickrClient : NSObject {
 
                 
             }
+            print("1 YOLO")
             // pick a random page!
             let pageLimit = min(totalPages, 40)
             let randomPage = Int(arc4random_uniform(UInt32(pageLimit))) + 1
@@ -111,13 +117,6 @@ class FlickrClient : NSObject {
         
     }
         
-        
-        
-        
-    
-    
-    
-    
     
     class func sharedInstance() -> FlickrClient {
         struct Singleton {

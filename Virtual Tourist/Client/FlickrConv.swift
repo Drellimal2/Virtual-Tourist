@@ -39,12 +39,13 @@ extension FlickrClient {
         }
     }
     
-    func getPhotos(lat : Double, lng : Double, completionHandler : @escaping (_ result: AnyObject?, _ error: NSError?) -> Void){
+    func getPhotos(pin: Pin, completionHandler : @escaping (_ result: AnyObject?, _ error: NSError?) -> Void){
         
         let methodParameters = [
             FlickrUtils.ParameterKeys.Method: FlickrUtils.ParameterValues.SearchMethod,
+            "per_page" : 50 as Any,
             FlickrUtils.ParameterKeys.APIKey: FlickrUtils.ParameterValues.APIKey,
-            FlickrUtils.ParameterKeys.BoundingBox: bboxString(lat: lat, lng : lng),
+            FlickrUtils.ParameterKeys.BoundingBox: bboxString(lat: pin.lat, lng : pin.lng),
             FlickrUtils.ParameterKeys.SafeSearch: FlickrUtils.ParameterValues.UseSafeSearch,
             FlickrUtils.ParameterKeys.Extras: FlickrUtils.ParameterValues.MediumURL,
             FlickrUtils.ParameterKeys.Format: FlickrUtils.ParameterValues.ResponseFormat,
@@ -56,7 +57,10 @@ extension FlickrClient {
         task.resume()
         
         
-        
     }
+    
+    
+        
+    
     
 }

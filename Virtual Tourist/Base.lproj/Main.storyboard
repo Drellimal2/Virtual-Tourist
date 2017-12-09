@@ -36,7 +36,11 @@
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <navigationItem key="navigationItem" title="My Travel Map" id="3fD-yO-jhu">
-                        <barButtonItem key="rightBarButtonItem" style="done" systemItem="trash" id="57m-rL-m4G"/>
+                        <barButtonItem key="rightBarButtonItem" style="done" systemItem="trash" id="57m-rL-m4G">
+                            <connections>
+                                <action selector="deleteAll:" destination="BYZ-38-t0r" id="ZSv-wj-9Mo"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <connections>
                         <outlet property="longPressGestureRecognizer" destination="qWl-Q7-Oqk" id="KRf-1x-dJ7"/>
@@ -70,23 +74,37 @@
                                             <constraint firstAttribute="height" constant="150" id="5RJ-A3-PxP"/>
                                         </constraints>
                                     </mapView>
-                                    <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="K2F-Re-cw5">
+                                    <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="K2F-Re-cw5">
                                         <rect key="frame" x="0.0" y="158" width="359" height="381"/>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="aKD-mA-4e0">
-                                            <size key="itemSize" width="50" height="50"/>
+                                            <size key="itemSize" width="111" height="103"/>
                                             <size key="headerReferenceSize" width="0.0" height="0.0"/>
                                             <size key="footerReferenceSize" width="0.0" height="0.0"/>
                                             <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                         </collectionViewFlowLayout>
                                         <cells>
-                                            <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="Xcg-ea-QhM">
-                                                <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                            <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="pinPic" id="Xcg-ea-QhM" customClass="AlbumCollectionViewCell" customModule="Virtual_Tourist" customModuleProvider="target">
+                                                <rect key="frame" x="0.0" y="0.0" width="111" height="103"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO">
-                                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="111" height="103"/>
                                                     <autoresizingMask key="autoresizingMask"/>
+                                                    <subviews>
+                                                        <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="cSx-Wv-RJe">
+                                                            <rect key="frame" x="0.0" y="0.0" width="111" height="103"/>
+                                                        </imageView>
+                                                    </subviews>
                                                 </view>
+                                                <constraints>
+                                                    <constraint firstItem="cSx-Wv-RJe" firstAttribute="top" secondItem="Xcg-ea-QhM" secondAttribute="top" id="6Cc-6Q-30p"/>
+                                                    <constraint firstItem="cSx-Wv-RJe" firstAttribute="leading" secondItem="Xcg-ea-QhM" secondAttribute="leading" id="8kh-8m-1FV"/>
+                                                    <constraint firstAttribute="trailing" secondItem="cSx-Wv-RJe" secondAttribute="trailing" id="X1n-t7-fCS"/>
+                                                    <constraint firstAttribute="bottom" secondItem="cSx-Wv-RJe" secondAttribute="bottom" id="qhF-vr-5gX"/>
+                                                </constraints>
+                                                <connections>
+                                                    <outlet property="imageView" destination="cSx-Wv-RJe" id="gTc-Tl-1dN"/>
+                                                </connections>
                                             </collectionViewCell>
                                         </cells>
                                     </collectionView>
@@ -121,7 +139,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Kqi-Mk-ohK" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1649" y="133"/>
+            <point key="canvasLocation" x="1648.8" y="132.68365817091455"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="Tb5-1e-Wph">

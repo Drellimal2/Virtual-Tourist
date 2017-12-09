@@ -2,7 +2,7 @@
 //  Pin+CoreDataProperties.swift
 //  Virtual Tourist
 //
-//  Created by Dane Miller on 12/7/17.
+//  Created by Dane Miller on 12/8/17.
 //  Copyright © 2017 Dane Miller. All rights reserved.
 //
 //
@@ -17,9 +17,9 @@ extension Pin {
         return NSFetchRequest<Pin>(entityName: "Pin")
     }
 
+    @NSManaged public var dateAdded: NSDate?
     @NSManaged public var lat: Double
     @NSManaged public var lng: Double
-    @NSManaged public var dateAdded: NSDate?
     @NSManaged public var photos: NSSet?
 
 }

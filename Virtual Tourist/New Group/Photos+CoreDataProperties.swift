@@ -2,7 +2,7 @@
 //  Photos+CoreDataProperties.swift
 //  Virtual Tourist
 //
-//  Created by Dane Miller on 12/7/17.
+//  Created by Dane Miller on 12/8/17.
 //  Copyright © 2017 Dane Miller. All rights reserved.
 //
 //

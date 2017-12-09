@@ -15,9 +15,9 @@ struct FlickrUtils {
         static let APIScheme = "https"
         static let APIHost = "api.flickr.com"
         static let APIPath = "/services/rest"
-        
-        static let SearchBBoxHalfWidth = 1.0
-        static let SearchBBoxHalfHeight = 1.0
+        // This half width provides an approx. 100km^2 box
+        static let SearchBBoxHalfWidth = 0.05
+        static let SearchBBoxHalfHeight = 0.05
         static let SearchLatRange = (-90.0, 90.0)
         static let SearchLonRange = (-180.0, 180.0)
     }
