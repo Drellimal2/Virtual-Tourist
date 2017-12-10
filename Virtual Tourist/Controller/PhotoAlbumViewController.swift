@@ -15,10 +15,11 @@ class PhotoAlbumViewController: UIViewController {
     @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var albumView: UICollectionView!
+    
+    @IBOutlet weak var newCollectionBtn: UIButton!
+    
     let delegate = UIApplication.shared.delegate as! AppDelegate
-    
     var pinStack : CoreDataStack? = nil
-    
     let flickrCli = FlickrClient.sharedInstance()
     var pin : Pin?
     var backgroundPin : Pin?
@@ -30,7 +31,6 @@ class PhotoAlbumViewController: UIViewController {
         albumView.delegate = self
         albumView.dataSource = self
         setupPins()
-        
         setupFlowLayout()
         setupMap()
     }
@@ -50,6 +50,10 @@ class PhotoAlbumViewController: UIViewController {
 
         }
         
+        if photos?.count == 0 {
+            albumView.backgroundView = NoPhotosView(frame: albumView.frame)
+            getPinPhotos()
+        }
          subscribeToNotification(.NSManagedObjectContextObjectsDidChange, selector: #selector(managedObjectContextObjectsDidChange), object: pinStack?.context)
     }
     
@@ -62,24 +66,48 @@ class PhotoAlbumViewController: UIViewController {
     }
 
     @IBAction func fetchNewCollection(_ sender: Any) {
+        setButtonEnabled(false)
         deletePinPhotos(pin: backgroundPin!, moc: (pinStack?.backgroundContext)!)
         print("pins photos = \(String(describing: pin?.photos?.count))")
         let pred = NSPredicate(format: "dateAdded = %@", argumentArray: [pin?.dateAdded as Any])
         let backgroundPins = getAllPins(pred, moc: (pinStack?.backgroundContext)!)
         if backgroundPins.count > 0 {
             backgroundPin = backgroundPins[0]
-        
-            flickrCli.getPhotos(pin: backgroundPin!) { (data, error) in
-                if let dat = data{
-                    print((dat as! [[String : AnyObject]]).count)
-                    convertFlickrDataToPhotos(pin: self.backgroundPin!, data: dat as! [[String : AnyObject]], moc: (self.pinStack?.backgroundContext)!  )
-                }
-            }
+            getPinPhotos()
+            
         } else {
-            print("could not gte pins")
+            print("could not get pins")
         }
         
     }
+    
+    func getPinPhotos(){
+        flickrCli.getPhotos(pin: backgroundPin!) { (data, error) in
+            
+            
+            
+            if let err = error {
+                alert(title: "Error", message: err.localizedDescription, controller: self)
+                performUIUpdatesOnMain {
+                    self.setButtonEnabled(true)
+                }
+                return
+            }
+            if let dat = data{
+                if (dat as! [[String : AnyObject]]).count == 0{
+                    alert(title: "No Photos Found", message: "This location has no associated photos", controller: self)
+                    performUIUpdatesOnMain {
+                        self.setButtonEnabled(true)
+                    }
+                    return
+                }
+                print((dat as! [[String : AnyObject]]).count)
+                convertFlickrDataToPhotos(pin: self.backgroundPin!, data: dat as! [[String : AnyObject]], moc: (self.pinStack?.backgroundContext)!  )
+            }
+            
+        }
+    }
+    
     
     func setupFlowLayout(){
         let space:CGFloat = 8.0
@@ -91,7 +119,18 @@ class PhotoAlbumViewController: UIViewController {
         flowLayout.scrollDirection = .vertical
     }
     
+    func setButtonEnabled(_ enabled : Bool){
+        newCollectionBtn.isEnabled = enabled
+        
+        if enabled {
+            newCollectionBtn.alpha = 1.0
 
+        } else {
+            newCollectionBtn.alpha = 0.5
+        }
+        
+    
+    }
 }
 
 extension PhotoAlbumViewController : UICollectionViewDelegate, UICollectionViewDataSource {
@@ -118,7 +157,14 @@ extension PhotoAlbumViewController : UICollectionViewDelegate, UICollectionViewD
             print("not allowed")
         }
     }
-   
+    
+    func updateAlbumView(){
+        if photos?.count == 0{
+            albumView.backgroundView = NoPhotosView(frame: albumView.frame)
+        } else {
+            albumView.backgroundView = nil
+        }
+    }
 }
 
 extension PhotoAlbumViewController : MKMapViewDelegate {
@@ -158,23 +204,32 @@ extension PhotoAlbumViewController {
         guard let userInfo = notification.userInfo else { return }
         
         if let inserts = userInfo[NSInsertedObjectsKey] as? Set<NSManagedObject>, inserts.count > 0 {
-            for insert in inserts{
-                if insert is Photos && (insert as! Photos).pin == pin{
-                    photos?.append((insert as! Photos))
-                    albumView.insertItems(at: [IndexPath(row : (photos?.count)! - 1, section : 0)])
-                }
-            }
-            print("Inserted \(inserts.count)")
+            performUIUpdatesOnMain {
 
+                for insert in inserts{
+                    if insert is Photos && (insert as! Photos).pin == self.pin{
+                        self.photos?.append((insert as! Photos))
+                        self.albumView.insertItems(at: [IndexPath(row : (self.photos?.count)! - 1, section : 0)])
+                    }
+                }
             
+        
+                print("Inserted \(inserts.count)")
+                
+                self.updateAlbumView()
+                self.setButtonEnabled(true)
+            }
         }
         
         if let updates = userInfo[NSUpdatedObjectsKey] as? Set<NSManagedObject>, updates.count > 0 {
-            for updt in updates{
-                if updt is Photos && (updt as! Photos).pin == pin {
-                    let ind = photos?.index(of: updt as! Photos)
-                    photos![ind!] = updt as! Photos
-                    albumView.reloadItems(at: [IndexPath(row : ind!, section : 0)])
+            performUIUpdatesOnMain {
+
+                for updt in updates{
+                    if updt is Photos && (updt as! Photos).pin == self.pin {
+                        let ind = self.photos?.index(of: updt as! Photos)
+                        self.photos![ind!] = updt as! Photos
+                            self.albumView.reloadItems(at: [IndexPath(row : ind!, section : 0)])
+                    }
                     
                 }
             }
@@ -184,17 +239,20 @@ extension PhotoAlbumViewController {
         }
         
         if let deletes = userInfo[NSDeletedObjectsKey] as? Set<NSManagedObject>, deletes.count > 0 {
-            for deleted in deletes {
-                if deleted is Photos {
-                    if (photos?.contains(deleted as! Photos))!{
-                        let ind = photos?.index(of: deleted as! Photos)
-                        photos?.remove(at: ind!)
-                        albumView.deleteItems(at: [IndexPath(row : ind!, section :0)])
+            performUIUpdatesOnMain {
+                
+                for deleted in deletes {
+                    if deleted is Photos {
+                        if (self.photos?.contains(deleted as! Photos))!{
+                            let ind = self.photos?.index(of: deleted as! Photos)
+                            self.photos?.remove(at: ind!)
+                            self.albumView.deleteItems(at: [IndexPath(row : ind!, section :0)])
+                        }
                     }
                 }
+                print("Deleted \(deletes.count)")
+                self.updateAlbumView()
             }
-            print("Deleted \(deletes.count)")
-            
         }
     }
 }

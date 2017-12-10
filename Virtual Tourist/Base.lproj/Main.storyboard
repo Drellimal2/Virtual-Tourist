@@ -110,11 +110,15 @@
                                     </collectionView>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="x4E-my-xfz">
                                         <rect key="frame" x="0.0" y="547" width="359" height="40"/>
-                                        <color key="backgroundColor" red="0.99999600649999998" green="1" blue="1" alpha="0.81094820205479456" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="backgroundColor" red="0.92143100499999997" green="0.92145264149999995" blue="0.92144101860000005" alpha="0.6366652397260274" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="40" id="b4i-vX-gHM"/>
                                         </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                         <state key="normal" title="New Collection"/>
+                                        <state key="disabled">
+                                            <color key="titleColor" red="0.66422420739999999" green="0.66424006219999998" blue="0.66423153879999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </state>
                                         <connections>
                                             <action selector="fetchNewCollection:" destination="jZc-6J-pql" eventType="touchUpInside" id="XKW-OU-CSu"/>
                                         </connections>
@@ -135,6 +139,7 @@
                         <outlet property="albumView" destination="K2F-Re-cw5" id="A5G-3E-jJW"/>
                         <outlet property="flowLayout" destination="aKD-mA-4e0" id="dtF-5K-ggX"/>
                         <outlet property="mapView" destination="GdF-AA-nXo" id="6S1-vP-bcG"/>
+                        <outlet property="newCollectionBtn" destination="x4E-my-xfz" id="Z7g-kO-bfq"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Kqi-Mk-ohK" userLabel="First Responder" sceneMemberID="firstResponder"/>

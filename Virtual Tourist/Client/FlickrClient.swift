@@ -43,8 +43,10 @@ class FlickrClient : NSObject {
             /* GUARD: Was there an error? */
             guard (error == nil) else {
                 completionHandler(nil, error! as NSError)
+                print(error.debugDescription)
                 return
             }
+            
             
             /* GUARD: Did we get a successful 2XX response? */
             guard let statusCode = (response as? HTTPURLResponse)?.statusCode, statusCode >= 200 && statusCode <= 299 else {
@@ -105,7 +107,6 @@ class FlickrClient : NSObject {
 
                 
             }
-            print("1 YOLO")
             // pick a random page!
             let pageLimit = min(totalPages, 40)
             let randomPage = Int(arc4random_uniform(UInt32(pageLimit))) + 1
