@@ -29,7 +29,6 @@ class MapPinViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         pinStack = delegate.stack
-        mapView.delegate = self
         setupTempPin()
         getPins()
         recoverOldMap()
@@ -125,13 +124,8 @@ class MapPinViewController: UIViewController {
         annotation.title = String(describing: index)
         print(annotation.title ?? "Nope")
         pins.append(newPin)
-        //getPhotos(pin: newPin)
-        flickrCli.getPhotos(pin: newPin) { (data, error) in
-            if let dat = data{
-                print((dat as! [[String : AnyObject]]).count)
-                convertFlickrDataToPhotos(pin: newPin, data: dat as! [[String : AnyObject]], moc: (self.pinStack?.context)!  )
-            }
-        }
+        getPhotos(pin: newPin)
+        
         annotation.coordinate = touchMapCoordinate
        
         mapView.addAnnotation(annotation)

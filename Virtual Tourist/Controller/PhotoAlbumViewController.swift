@@ -27,9 +27,7 @@ class PhotoAlbumViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        mapView.delegate = self
-        albumView.delegate = self
-        albumView.dataSource = self
+        
         setupPins()
         setupFlowLayout()
         setupMap()

@@ -22,6 +22,7 @@
                                 <rect key="frame" x="8" y="72" width="359" height="587"/>
                                 <gestureRecognizers/>
                                 <connections>
+                                    <outlet property="delegate" destination="BYZ-38-t0r" id="uP4-34-0DC"/>
                                     <outletCollection property="gestureRecognizers" destination="qWl-Q7-Oqk" appends="YES" id="wK8-QE-bGZ"/>
                                 </connections>
                             </mapView>
@@ -73,6 +74,9 @@
                                         <constraints>
                                             <constraint firstAttribute="height" constant="150" id="5RJ-A3-PxP"/>
                                         </constraints>
+                                        <connections>
+                                            <outlet property="delegate" destination="jZc-6J-pql" id="BMg-dF-P3q"/>
+                                        </connections>
                                     </mapView>
                                     <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="K2F-Re-cw5">
                                         <rect key="frame" x="0.0" y="158" width="359" height="381"/>
@@ -107,6 +111,10 @@
                                                 </connections>
                                             </collectionViewCell>
                                         </cells>
+                                        <connections>
+                                            <outlet property="dataSource" destination="jZc-6J-pql" id="xXH-AG-A3P"/>
+                                            <outlet property="delegate" destination="jZc-6J-pql" id="C1Q-ZJ-c0J"/>
+                                        </connections>
                                     </collectionView>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="x4E-my-xfz">
                                         <rect key="frame" x="0.0" y="547" width="359" height="40"/>
