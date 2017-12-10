@@ -60,7 +60,7 @@ func getAllPins(_ predicate : NSPredicate? = nil, moc : NSManagedObjectContext) 
 }
 
 func getAllPhotos(_ predicate : NSPredicate? = nil, moc : NSManagedObjectContext) -> [Photo]{
-    let photosFetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Photos")
+    let photosFetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Photo")
     if let pred = predicate{
         photosFetch.predicate = pred
     }

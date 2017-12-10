@@ -17,7 +17,7 @@ public class Photo: NSManagedObject {
         // An EntityDescription is an object that has access to all
         // the information you provided in the Entity part of the model
         // you need it to create an instance of this class.
-        if let ent = NSEntityDescription.entity(forEntityName: "Photos", in: context) {
+        if let ent = NSEntityDescription.entity(forEntityName: "Photo", in: context) {
             self.init(entity: ent, insertInto: context)
             self.title = title
             self.imageUrl = imageUrl
