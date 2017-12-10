@@ -22,7 +22,6 @@ class PhotoAlbumViewController: UIViewController {
     var pinStack : CoreDataStack? = nil
     let flickrCli = FlickrClient.sharedInstance()
     var pin : Pin?
-    var backgroundPin : Pin?
     var photos : [Photo]?
     
     override func viewDidLoad() {
@@ -33,57 +32,28 @@ class PhotoAlbumViewController: UIViewController {
         setupMap()
     }
     
+    
     func setupPins(){
         pinStack = delegate.stack
-        
-        let pred = NSPredicate(format: "dateAdded = %@", argumentArray: [pin?.dateAdded as Any])
-        let backgroundPins = getAllPins(pred, moc: (pinStack?.backgroundContext)!)
-        if backgroundPins.count > 0{
-            backgroundPin = backgroundPins[0]
-            photos = getPhotosForPin(pin: backgroundPin, moc: (pinStack?.context)!)
-
-        }
-        if photos?.count != pin?.photos?.count {
-            photos = pin?.photos?.allObjects as? [Photo]
-
-        }
-        
-        if photos?.count == 0 {
+        photos = (pin?.photos)!.allObjects as? [Photo]
+        if photos?.count == 0{
             albumView.backgroundView = NoPhotosView(frame: albumView.frame)
-            getPinPhotos()
+
+            DispatchQueue.main.async{
+                self.pinStack?.performBackgroundBatchOperation{
+                    (workingContext) in
+                    let newPin = workingContext.object(with: (self.pin?.objectID)!) as! Pin
+                    self.getPhotos(pin: newPin)
+                    
+                }
+                
+            }
         }
+
          subscribeToNotification(.NSManagedObjectContextObjectsDidChange, selector: #selector(managedObjectContextObjectsDidChange), object: pinStack?.context)
     }
-    
-    func setupMap(){
-        mapView.centerCoordinate = CLLocationCoordinate2D(latitude: (pin?.lat)!, longitude: (pin?.lng)!)
-        let annotation = MKPointAnnotation()
-        annotation.title = "Here"
-        annotation.coordinate = CLLocationCoordinate2D(latitude: (pin?.lat)!, longitude: (pin?.lng)!)
-        mapView.addAnnotation(annotation)
-    }
-
-    @IBAction func fetchNewCollection(_ sender: Any) {
-        setButtonEnabled(false)
-        deletePinPhotos(pin: backgroundPin!, moc: (pinStack?.backgroundContext)!)
-        print("pins photos = \(String(describing: pin?.photos?.count))")
-        let pred = NSPredicate(format: "dateAdded = %@", argumentArray: [pin?.dateAdded as Any])
-        let backgroundPins = getAllPins(pred, moc: (pinStack?.backgroundContext)!)
-        if backgroundPins.count > 0 {
-            backgroundPin = backgroundPins[0]
-            getPinPhotos()
-            
-        } else {
-            print("could not get pins")
-        }
-        
-    }
-    
-    func getPinPhotos(){
-        flickrCli.getPhotos(pin: backgroundPin!) { (data, error) in
-            
-            
-            
+    func getPhotos(pin : Pin){
+        flickrCli.getPhotos(pin: pin) { (data, error) in
             if let err = error {
                 alert(title: "Error", message: err.localizedDescription, controller: self)
                 performUIUpdatesOnMain {
@@ -99,12 +69,36 @@ class PhotoAlbumViewController: UIViewController {
                     }
                     return
                 }
-                print((dat as! [[String : AnyObject]]).count)
-                convertFlickrDataToPhotos(pin: self.backgroundPin!, data: dat as! [[String : AnyObject]], moc: (self.pinStack?.backgroundContext)!  )
+                convertFlickrDataToPhotos(pin: pin, data: dat as! [[String : AnyObject]], stack: (self.pinStack)!  )
             }
             
         }
     }
+    
+    func setupMap(){
+        mapView.centerCoordinate = CLLocationCoordinate2D(latitude: (pin?.lat)!, longitude: (pin?.lng)!)
+        let annotation = MKPointAnnotation()
+        annotation.title = "Here"
+        annotation.coordinate = CLLocationCoordinate2D(latitude: (pin?.lat)!, longitude: (pin?.lng)!)
+        mapView.addAnnotation(annotation)
+    }
+
+    @IBAction func fetchNewCollection(_ sender: Any) {
+        setButtonEnabled(false)
+        deletePinPhotos(pin: pin!, stack: pinStack!)
+        print("pins photos = \(String(describing: pin?.photos?.count))")
+        DispatchQueue.main.async {
+            self.pinStack?.performBackgroundBatchOperation{
+                (workingContext) in
+                let backpin = workingContext.object(with: (self.pin?.objectID)!) as! Pin
+                self.getPhotos(pin: backpin)
+                
+            }
+        }
+        
+    }
+    
+
     
     
     func setupFlowLayout(){
@@ -150,13 +144,14 @@ extension PhotoAlbumViewController : UICollectionViewDelegate, UICollectionViewD
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let cell = collectionView.cellForItem(at: indexPath) as! AlbumCollectionViewCell
         if cell.imageView.image != Images.placeholder{
-            deletePinPhoto(pin: pin!, photo: photos![indexPath.row], moc: (pinStack?.context)!)
+            deletePinPhoto(pin: pin!, photo: photos![indexPath.row], stack: pinStack!)
         } else {
             print("not allowed")
         }
     }
     
     func updateAlbumView(){
+        pinStack?.save()
         if photos?.count == 0{
             albumView.backgroundView = NoPhotosView(frame: albumView.frame)
         } else {
@@ -212,7 +207,7 @@ extension PhotoAlbumViewController {
                 }
             
         
-                print("Inserted \(inserts.count)")
+                print("[PhotoAlbum] Inserted \(inserts.count)")
                 
                 self.updateAlbumView()
                 self.setButtonEnabled(true)
@@ -231,7 +226,7 @@ extension PhotoAlbumViewController {
                     
                 }
             }
-            print("Updated \(updates.count)")
+            print("[PhotoAlbum] Updated \(updates.count)")
 
             
         }
@@ -248,7 +243,7 @@ extension PhotoAlbumViewController {
                         }
                     }
                 }
-                print("Deleted \(deletes.count)")
+                print("[PhotoAlbum] Deleted \(deletes.count)")
                 self.updateAlbumView()
             }
         }

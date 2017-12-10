@@ -25,7 +25,7 @@ class FlickrClient : NSObject {
         // create session and request
         let session = URLSession.shared
         var methodParameters = methodParams
-        methodParameters[FlickrUtils.ParameterKeys.Page] = pageNum as AnyObject
+        methodParameters[FlickrConstants.ParameterKeys.Page] = pageNum as AnyObject
         
         let request = URLRequest(url: flickrURLFromParameters(methodParameters))
 
@@ -75,7 +75,7 @@ class FlickrClient : NSObject {
             }
             
             /* GUARD: Did Flickr return an error (stat != ok)? */
-            guard let stat = parsedResult[FlickrUtils.ResponseKeys.Status] as? String, stat == FlickrUtils.ResponseValues.OKStatus else {
+            guard let stat = parsedResult[FlickrConstants.ResponseKeys.Status] as? String, stat == FlickrConstants.ResponseValues.OKStatus else {
                 completionHandler(nil, makeError("Flickr API returned an error!"))
 
                 print("Flickr API returned an error. See error code and message in \(parsedResult)")
@@ -83,23 +83,23 @@ class FlickrClient : NSObject {
             }
             
             /* GUARD: Is "photos" key in our result? */
-            guard let photosDictionary = parsedResult[FlickrUtils.ResponseKeys.Photos] as? [String:AnyObject] else {
+            guard let photosDictionary = parsedResult[FlickrConstants.ResponseKeys.Photos] as? [String:AnyObject] else {
                 completionHandler(nil, makeError("Cannot find photos key!"))
-                print("Cannot find keys '\(FlickrUtils.ResponseKeys.Photos)' in \(parsedResult)")
+                print("Cannot find keys '\(FlickrConstants.ResponseKeys.Photos)' in \(parsedResult)")
                 return
             }
             
             /* GUARD: Is "pages" key in the photosDictionary? */
-            guard let totalPages = photosDictionary[FlickrUtils.ResponseKeys.Pages] as? Int else {
+            guard let totalPages = photosDictionary[FlickrConstants.ResponseKeys.Pages] as? Int else {
                 completionHandler(nil, makeError("Cannot find pages key!"))
-                print("Cannot find key '\(FlickrUtils.ResponseKeys.Pages)' in \(photosDictionary)")
+                print("Cannot find key '\(FlickrConstants.ResponseKeys.Pages)' in \(photosDictionary)")
                 return
             }
             if count >= 0 || totalPages == 1 {
                 /* GUARD: Is the "photo" key in photosDictionary? */
-                guard let photosArray = photosDictionary[FlickrUtils.ResponseKeys.Photo] as? [[String: AnyObject]] else {
+                guard let photosArray = photosDictionary[FlickrConstants.ResponseKeys.Photo] as? [[String: AnyObject]] else {
                     completionHandler(nil, makeError("Cannot find photo key!"))
-                    print("Cannot find key '\(FlickrUtils.ResponseKeys.Photo)' in \(photosDictionary)")
+                    print("Cannot find key '\(FlickrConstants.ResponseKeys.Photo)' in \(photosDictionary)")
                     return
                 }
                 
@@ -108,7 +108,7 @@ class FlickrClient : NSObject {
                 
             }
             // pick a random page!
-            let pageLimit = min(totalPages, 40)
+            let pageLimit = min(totalPages, 80)
             let randomPage = Int(arc4random_uniform(UInt32(pageLimit))) + 1
             let cnt = count + 1
             let _ = self.taskMethod(methodParams: methodParams, pageNum: randomPage, count : cnt,completionHandler: completionHandler)

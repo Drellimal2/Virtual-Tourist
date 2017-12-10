@@ -82,72 +82,82 @@ func getPhotosForPin(pin : Pin?, moc : NSManagedObjectContext) -> [Photo]?{
     
 }
 
-func convertFlickrDataToPhotos (pin : Pin, data : [[String : AnyObject]], moc : NSManagedObjectContext){
+func convertFlickrDataToPhotos (pin : Pin, data : [[String : AnyObject]], stack : CoreDataStack){
     print(data.count)
-    for flickrPhoto in data{
-        let title = flickrPhoto[FlickrUtils.ResponseKeys.Title] as? String
-        let photoUrl = flickrPhoto[FlickrUtils.ResponseKeys.MediumURL] as! String
-//        var imageUrl = URL(string : photoUrl)
-        let photo = Photo(title: title!, imageUrl: photoUrl, context: moc)
-        
-        photo.pin = pin
-        
-        imageFromServerURL(photo: photo, moc : moc)
+    stack.performBackgroundBatchOperation{
+        (workingContext) in
+        for flickrPhoto in data{
+            let title = flickrPhoto[FlickrConstants.ResponseKeys.Title] as? String
+            let photoUrl = flickrPhoto[FlickrConstants.ResponseKeys.MediumURL] as! String
+            let photo = Photo(title: title!, imageUrl: photoUrl, context: workingContext)
+            photo.pin = pin
 
+            imageFromServerURL(photo: photo, stack: stack)
+        }
     }
-    do {
-        try moc.save()
-    } catch {
-        print("ooops cannot save")
-    }
+    
     print("data complete")
     
 }
 
-func imageFromServerURL(photo : Photo, moc: NSManagedObjectContext) {
+func imageFromServerURL(photo : Photo, stack : CoreDataStack) {
     
+    
+    
+
     URLSession.shared.dataTask(with: NSURL(string: photo.imageUrl!)! as URL, completionHandler: { (data, response, error) -> Void in
         
         if error != nil {
             print(error!)
             return
         }
-
-        photo.image = data! as NSData
-
-        do {
-            try moc.save()
-        } catch {
-            print("ooops cannot save")
+        stack.performBackgroundBatchOperation{
+            (workingContext) in
+            do {
+                let newphoto = try workingContext.existingObject(with: photo.objectID) as! Photo
+                newphoto.image = data! as NSData
+            } catch {
+                print("OOPS")
+            }
+            
         }
+        
     }).resume()
     
 }
-
-func deletePinPhotos(pin: Pin, moc : NSManagedObjectContext){
-    for photo in pin.photos!{
-        moc.delete(photo as! NSManagedObject)
-        
-    }
-    do {
-        try moc.save()
-    } catch {
-        print("ooops cannot save")
-    }
     
+    
+    
+
+
+func deletePinPhotos(pin: Pin, stack : CoreDataStack){
+    DispatchQueue.main.async {
+        stack.performBackgroundBatchOperation{
+            (workingContext) in
+                let newPin = workingContext.object(with: pin.objectID) as! Pin
+            for photo in newPin.photos!{
+                workingContext.delete(photo as! NSManagedObject)
+            }
+        }
+    }
 }
 
-func deletePinPhoto(pin :Pin, photo: Photo, moc : NSManagedObjectContext){
     
-    if (pin.photos?.contains(photo))!{
-        moc.delete(photo)
+
+
+func deletePinPhoto(pin :Pin, photo: Photo, stack : CoreDataStack){
+    
+    DispatchQueue.main.async {
+        stack.performBackgroundBatchOperation{
+            (workingContext) in
+            let newPin = workingContext.object(with: pin.objectID) as! Pin
+            let photoToDelete = workingContext.object(with: photo.objectID) as! Photo
+            if (newPin.photos?.contains(photoToDelete))!{
+                workingContext.delete(photoToDelete as NSManagedObject)
+            }
+        }
     }
-    do {
-        try moc.save()
-        print("saved")
-    } catch {
-        print("ooops cannot save")
-    }
+    
 }
 
 

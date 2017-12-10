@@ -8,6 +8,7 @@
 
 import UIKit
 import MapKit
+import CoreData
 
 class MapPinViewController: UIViewController {
 
@@ -24,11 +25,17 @@ class MapPinViewController: UIViewController {
     
     var initialCenter = CGPoint()  // The initial center point of the view
     
-    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        print("yeeehaaa")
+        subscribeToNotification(.NSManagedObjectContextObjectsDidChange, selector: #selector(managedObjectContextObjectsDidChange), object: pinStack?.context)
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         pinStack = delegate.stack
+
         setupTempPin()
         getPins()
         recoverOldMap()
@@ -37,7 +44,6 @@ class MapPinViewController: UIViewController {
     
     @IBAction func deleteAll(_ sender: Any) {
         let okAction = UIAlertAction(title: "I'm Sure", style: .destructive) { (action) in
-            // try self.pinStack?.dropAllData() This crashed Xcode
             self.deletePins()
             self.getPins()
             
@@ -47,7 +53,6 @@ class MapPinViewController: UIViewController {
             print("Cancelled delete operation")
             return
         }
-        
         alert(title: "Are you sure?", message: "This will delete all pins and photos.", controller: self, actions : [okAction, cancelAction])
     }
     
@@ -74,14 +79,10 @@ class MapPinViewController: UIViewController {
         for pin in pins{
             pinStack?.context.delete(pin)
         }
-        do{
-            try pinStack?.context.save()
-            mapView.removeAnnotations(mapView.annotations)
+        pinStack?.save()
 
-        } catch {
-            print("Could not delete all data")
-            alert(title: "Error", message: "Could not delete pins", controller: self)
-        }
+        mapView.removeAnnotations(mapView.annotations)
+
         
     }
     
@@ -115,20 +116,16 @@ class MapPinViewController: UIViewController {
         mypintemp.isHidden = true
         let touchPoint = gestureRecognizer.location(in: mapView)
         let touchMapCoordinate = mapView.convert(touchPoint, toCoordinateFrom: mapView)
+        DispatchQueue.main.async{
+            self.pinStack?.performBackgroundBatchOperation{
+                (workingContext) in
+                let newPin = Pin(lat: touchMapCoordinate.latitude, lng: touchMapCoordinate.longitude, context: workingContext)
+                self.getPhotos(pin: newPin)
+
+            }
         
-        let newPin = Pin(lat: touchMapCoordinate.latitude, lng: touchMapCoordinate.longitude, context: (pinStack?.context)!)
-        pinStack?.save()
+        }
         
-        let annotation = MKPointAnnotation()
-        let index = pins.count
-        annotation.title = String(describing: index)
-        print(annotation.title ?? "Nope")
-        pins.append(newPin)
-        getPhotos(pin: newPin)
-        
-        annotation.coordinate = touchMapCoordinate
-       
-        mapView.addAnnotation(annotation)
     }
     
     
@@ -148,7 +145,7 @@ class MapPinViewController: UIViewController {
     func getPhotos(pin : Pin){
         flickrCli.getPhotos(pin: pin) { (data, error) in
             if let dat = data {
-                convertFlickrDataToPhotos(pin: pin, data: dat as! [[String : AnyObject]], moc: (self.pinStack?.context)!  )
+                convertFlickrDataToPhotos(pin: pin, data: dat as! [[String : AnyObject]], stack: self.pinStack!)
             } else {
                 print(String(describing : error))
             }
@@ -163,6 +160,7 @@ extension MapPinViewController{
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         let dest = segue.destination as! PhotoAlbumViewController
         dest.pin = selPin
+        unsubscribeFromAllNotifications()
     }
     
 }
@@ -211,6 +209,61 @@ extension MapPinViewController : MKMapViewDelegate {
     
 }
 
+extension MapPinViewController{
+    
+    func subscribeToNotification(_ name: NSNotification.Name, selector: Selector, object : Any? = nil ) {
+        NotificationCenter.default.addObserver(self, selector: selector, name: name, object: object)
+    }
+    
+    func unsubscribeFromAllNotifications() {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    @objc func managedObjectContextObjectsDidChange(notification: NSNotification) {
+        guard let userInfo = notification.userInfo else { return }
+        
+        if let inserts = userInfo[NSInsertedObjectsKey] as? Set<NSManagedObject>, inserts.count > 0 {
+            
+            for insert in inserts{
+                if insert is Pin {
+                    let pin = insert as! Pin
+                    print(pin.dateAdded!)
+                    self.pins.append(pin)
+                    performUIUpdatesOnMain {
+                        
+                        let annotation = MKPointAnnotation()
+                        let index = self.pins.count - 1
+                        annotation.title = String(describing: index)
+                        
+                        annotation.coordinate = CLLocationCoordinate2D(latitude: pin.lat, longitude: pin.lng)
+                        
+                        self.mapView.addAnnotation(annotation)
+                    
+                    }
+                }
+                
+                if insert is Photo{
+                    if (insert as! Photo).image == nil{
+                        print("Needs Image")
+                    }
+                }
+            }
+            
+            print("Inserted \(inserts.count)")
+            
+        }
+        
+        if let updates = userInfo[NSUpdatedObjectsKey] as? Set<NSManagedObject>, updates.count > 0 {
+            print("Updated \(updates.count)")
+        }
+        
+        if let deletes = userInfo[NSDeletedObjectsKey] as? Set<NSManagedObject>, deletes.count > 0 {
+            print("Deleted \(deletes.count)")
+        }
+    }
+    
+    
+}
 
 
 

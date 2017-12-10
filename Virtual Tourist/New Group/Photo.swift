@@ -18,6 +18,7 @@ public class Photo: NSManagedObject {
         // the information you provided in the Entity part of the model
         // you need it to create an instance of this class.
         if let ent = NSEntityDescription.entity(forEntityName: "Photo", in: context) {
+            print("Photo in \(context.concurrencyType.rawValue)")
             self.init(entity: ent, insertInto: context)
             self.title = title
             self.imageUrl = imageUrl
