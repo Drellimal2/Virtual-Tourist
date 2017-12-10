@@ -28,8 +28,8 @@
 		353EE3861FDAE1B000124246 /* DataUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 353EE3851FDAE1B000124246 /* DataUtils.swift */; };
 		353EE3881FDB2EB700124246 /* AlbumCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 353EE3871FDB2EB700124246 /* AlbumCollectionViewCell.swift */; };
 		35654B831FDB86B0008BE143 /* Pin+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35654B7F1FDB86B0008BE143 /* Pin+CoreDataProperties.swift */; };
-		35654B851FDB86B0008BE143 /* Photos+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35654B811FDB86B0008BE143 /* Photos+CoreDataProperties.swift */; };
 		35AD0FE71FDCCB3400226FE3 /* NoPhotosView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35AD0FE61FDCCB3400226FE3 /* NoPhotosView.swift */; };
+		35AD0FED1FDCDA2500226FE3 /* Photo+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35AD0FEB1FDCDA2500226FE3 /* Photo+CoreDataProperties.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -56,8 +56,8 @@
 		353EE3851FDAE1B000124246 /* DataUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataUtils.swift; sourceTree = "<group>"; };
 		353EE3871FDB2EB700124246 /* AlbumCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumCollectionViewCell.swift; sourceTree = "<group>"; };
 		35654B7F1FDB86B0008BE143 /* Pin+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Pin+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		35654B811FDB86B0008BE143 /* Photos+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Photos+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		35AD0FE61FDCCB3400226FE3 /* NoPhotosView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoPhotosView.swift; sourceTree = "<group>"; };
+		35AD0FEB1FDCDA2500226FE3 /* Photo+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Photo+CoreDataProperties.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,8 +105,8 @@
 		353EE32F1FD9C9C100124246 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				35AD0FEB1FDCDA2500226FE3 /* Photo+CoreDataProperties.swift */,
 				35654B7F1FDB86B0008BE143 /* Pin+CoreDataProperties.swift */,
-				35654B811FDB86B0008BE143 /* Photos+CoreDataProperties.swift */,
 				353EE37D1FDA4CD900124246 /* Pin.swift */,
 				353EE37F1FDA4CD900124246 /* Photo.swift */,
 				353EE3301FD9C9FE00124246 /* Model.xcdatamodeld */,
@@ -247,8 +247,8 @@
 				353EE3461FD9CE4500124246 /* MyActivityIndicator.swift in Sources */,
 				353EE34D1FD9D17A00124246 /* FlickrClient.swift in Sources */,
 				353EE3811FDA4CD900124246 /* Pin.swift in Sources */,
+				35AD0FED1FDCDA2500226FE3 /* Photo+CoreDataProperties.swift in Sources */,
 				353EE37A1FDA4C9A00124246 /* Utils.swift in Sources */,
-				35654B851FDB86B0008BE143 /* Photos+CoreDataProperties.swift in Sources */,
 				353EE37C1FDA4CB900124246 /* CoreDataStack.swift in Sources */,
 				353EE3861FDAE1B000124246 /* DataUtils.swift in Sources */,
 				353EE31E1FD9C98000124246 /* AppDelegate.swift in Sources */,

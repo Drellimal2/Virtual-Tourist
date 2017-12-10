@@ -11,7 +11,7 @@ import Foundation
 import CoreData
 
 
-public class Photos: NSManagedObject {
+public class Photo: NSManagedObject {
     convenience init(title: String = "Image", imageUrl : String, image : Data? =  nil, context: NSManagedObjectContext) {
         
         // An EntityDescription is an object that has access to all

@@ -23,7 +23,7 @@ class PhotoAlbumViewController: UIViewController {
     let flickrCli = FlickrClient.sharedInstance()
     var pin : Pin?
     var backgroundPin : Pin?
-    var photos : [Photos]?
+    var photos : [Photo]?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -46,7 +46,7 @@ class PhotoAlbumViewController: UIViewController {
 
         }
         if photos?.count != pin?.photos?.count {
-            photos = pin?.photos?.allObjects as? [Photos]
+            photos = pin?.photos?.allObjects as? [Photo]
 
         }
         
@@ -207,8 +207,8 @@ extension PhotoAlbumViewController {
             performUIUpdatesOnMain {
 
                 for insert in inserts{
-                    if insert is Photos && (insert as! Photos).pin == self.pin{
-                        self.photos?.append((insert as! Photos))
+                    if insert is Photo && (insert as! Photo).pin == self.pin{
+                        self.photos?.append((insert as! Photo))
                         self.albumView.insertItems(at: [IndexPath(row : (self.photos?.count)! - 1, section : 0)])
                     }
                 }
@@ -225,9 +225,9 @@ extension PhotoAlbumViewController {
             performUIUpdatesOnMain {
 
                 for updt in updates{
-                    if updt is Photos && (updt as! Photos).pin == self.pin {
-                        let ind = self.photos?.index(of: updt as! Photos)
-                        self.photos![ind!] = updt as! Photos
+                    if updt is Photo && (updt as! Photo).pin == self.pin {
+                        let ind = self.photos?.index(of: updt as! Photo)
+                        self.photos![ind!] = updt as! Photo
                             self.albumView.reloadItems(at: [IndexPath(row : ind!, section : 0)])
                     }
                     
@@ -242,9 +242,9 @@ extension PhotoAlbumViewController {
             performUIUpdatesOnMain {
                 
                 for deleted in deletes {
-                    if deleted is Photos {
-                        if (self.photos?.contains(deleted as! Photos))!{
-                            let ind = self.photos?.index(of: deleted as! Photos)
+                    if deleted is Photo {
+                        if (self.photos?.contains(deleted as! Photo))!{
+                            let ind = self.photos?.index(of: deleted as! Photo)
                             self.photos?.remove(at: ind!)
                             self.albumView.deleteItems(at: [IndexPath(row : ind!, section :0)])
                         }

@@ -59,14 +59,14 @@ func getAllPins(_ predicate : NSPredicate? = nil, moc : NSManagedObjectContext) 
     
 }
 
-func getAllPhotos(_ predicate : NSPredicate? = nil, moc : NSManagedObjectContext) -> [Photos]{
+func getAllPhotos(_ predicate : NSPredicate? = nil, moc : NSManagedObjectContext) -> [Photo]{
     let photosFetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Photos")
     if let pred = predicate{
         photosFetch.predicate = pred
     }
     
     do {
-        let fetchedPins = try moc.fetch(photosFetch) as! [Photos]
+        let fetchedPins = try moc.fetch(photosFetch) as! [Photo]
         return fetchedPins
         
     } catch {
@@ -75,7 +75,7 @@ func getAllPhotos(_ predicate : NSPredicate? = nil, moc : NSManagedObjectContext
     
 }
 
-func getPhotosForPin(pin : Pin?, moc : NSManagedObjectContext) -> [Photos]?{
+func getPhotosForPin(pin : Pin?, moc : NSManagedObjectContext) -> [Photo]?{
     let pred = NSPredicate(format : "pin = %@", argumentArray : [pin!])
     let photos = getAllPhotos(pred, moc: moc)
     return photos
@@ -88,7 +88,7 @@ func convertFlickrDataToPhotos (pin : Pin, data : [[String : AnyObject]], moc : 
         let title = flickrPhoto[FlickrUtils.ResponseKeys.Title] as? String
         let photoUrl = flickrPhoto[FlickrUtils.ResponseKeys.MediumURL] as! String
 //        var imageUrl = URL(string : photoUrl)
-        let photo = Photos(title: title!, imageUrl: photoUrl, context: moc)
+        let photo = Photo(title: title!, imageUrl: photoUrl, context: moc)
         
         photo.pin = pin
         
@@ -104,7 +104,7 @@ func convertFlickrDataToPhotos (pin : Pin, data : [[String : AnyObject]], moc : 
     
 }
 
-func imageFromServerURL(photo : Photos, moc: NSManagedObjectContext) {
+func imageFromServerURL(photo : Photo, moc: NSManagedObjectContext) {
     
     URLSession.shared.dataTask(with: NSURL(string: photo.imageUrl!)! as URL, completionHandler: { (data, response, error) -> Void in
         
@@ -137,7 +137,7 @@ func deletePinPhotos(pin: Pin, moc : NSManagedObjectContext){
     
 }
 
-func deletePinPhoto(pin :Pin, photo: Photos, moc : NSManagedObjectContext){
+func deletePinPhoto(pin :Pin, photo: Photo, moc : NSManagedObjectContext){
     
     if (pin.photos?.contains(photo))!{
         moc.delete(photo)

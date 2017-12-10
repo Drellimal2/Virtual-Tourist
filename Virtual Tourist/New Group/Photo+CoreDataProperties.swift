@@ -1,8 +1,8 @@
 //
-//  Photos+CoreDataProperties.swift
+//  Photo+CoreDataProperties.swift
 //  Virtual Tourist
 //
-//  Created by Dane Miller on 12/8/17.
+//  Created by Dane Miller on 12/9/17.
 //  Copyright © 2017 Dane Miller. All rights reserved.
 //
 //
@@ -11,10 +11,10 @@ import Foundation
 import CoreData
 
 
-extension Photos {
+extension Photo {
 
-    @nonobjc public class func fetchRequest() -> NSFetchRequest<Photos> {
-        return NSFetchRequest<Photos>(entityName: "Photos")
+    @nonobjc public class func fetchRequest() -> NSFetchRequest<Photo> {
+        return NSFetchRequest<Photo>(entityName: "Photo")
     }
 
     @NSManaged public var image: NSData?
